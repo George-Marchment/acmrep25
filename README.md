@@ -1,12 +1,40 @@
 # Computational Reproducibility With Scientific Workflows: Analysing viral genomes with Nextflow
 
-## Abstract 
+<!-- vscode-markdown-toc -->
+* 1. [Abstract](#Abstract)
+* 2. [Learning Objectives and outline](#LearningObjectivesandoutline)
+* 3. [Tutoriel Material](#TutorielMaterial)
+	* 3.1. [Lecture](#Lecture)
+	* 3.2. [Pratical Session](#PraticalSession)
+		* 3.2.1. [Objectif](#Objectif)
+		* 3.2.2. [Input data](#Inputdata)
+		* 3.2.3. [Detailed steps](#Detailedsteps)
+		* 3.2.4. [List of tools needed](#Listoftoolsneeded)
+		* 3.2.5. [Analysis Questions](#AnalysisQuestions)
+		* 3.2.6. [Correction](#Correction)
+	* 3.3. [Reproducibility consensus](#Reproducibilityconsensus)
+* 4. [Intended Audience, Format and Special Equipment Needs](#IntendedAudienceFormatandSpecialEquipmentNeeds)
+* 5. [Authors](#Authors)
+* 6. [References](#References)
+* 7. [TODO](#TODO)
+
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc -->
+
+
+
+
+
+##  1. <a name='Abstract'></a>Abstract 
 
 In an era of generation of large datasets and complex scientific analyses, ensuring the reproducibility of data analyses has become paramount. Workflow management systems have emerged as a key solution to this challenge. By managing the software environment, task scheduling, parallelisation and communication with the execution machines (HPC, cloud, etc.), they significantly facilitate workflow development compared to historical practices (e.g., simple bash scripts), all while ensuring scalablility and a high level of reproducibility [2]. However, while they are becoming more popular, workflow management systems have not yet gained wide adoption within the scientific community, largely due to established practices and the perceived high learning curve associated with their use. 
 
 This tutorial aims at demonstrating the critical role of workflow management systems in implementing reproducible data analyses, with an emphasis on their capacity to encapsulate heterogeneous code, manage software environments, scale with the data size, and leverage heterogeneous computational resources efficiently. To do so, we will use the Nextflow [1] workflow system and a viral genome sequence reconstruction pipeline as a use case. This will demonstrate the fundamentals of Nextflow and illustrate how it can be used to easily implement, execute, and share a simple workflow. 
 
-## Learning Objectives and outline
+##  2. <a name='LearningObjectivesandoutline'></a>Learning Objectives and outline
 
 Key learning outcomes include (i) acquiring basic workflow concepts (ii) learning how to implement simple workflows and (iii) understanding the capabilities of workflow management systems in encapsulating heterogeneous code, scalability, software environment management, and computational resource management. The tutorial will be organized in three phases.
 1. We will start with a short lecture to present the main challenges in implementing reproducible data analyses, specifically using a motivating example for illustration. We will then introduce how workflow management systems are capable of solving these challenges. To achieve this, we will present the Nextflow framework and then demonstrate how it can be used to solve the motivating example. Finally, we will introduce the analysis pipeline to implement as a workflow. It consists of several viral genome sequencing datasets that need to go through multiple analysis steps in order to reconstruct full viral genomes with their annotations.
@@ -15,15 +43,15 @@ Key learning outcomes include (i) acquiring basic workflow concepts (ii) learnin
 
 By the end of the tutorial, participants will have a solid foundation in workflow management systems and be capable of designing and implementing reproducible data analysis workflows, aligning with the broader goals and themes of [ACM REP 2025]().
 
-## Tutoriel Material
+##  3. <a name='TutorielMaterial'></a>Tutoriel Material
 
-### Lecture
+###  3.1. <a name='Lecture'></a>Lecture
 
 Link to the lecture slides can be found [here]().
 
-### Pratical Session
+###  3.2. <a name='PraticalSession'></a>Pratical Session
 
-#### Objectif 
+####  3.2.1. <a name='Objectif'></a>Objectif 
 
 The goal is to analyse a SARS-CoV-2 sequencing dataset, in order to:
 1. Infer the full sequence of the virus
@@ -40,7 +68,7 @@ You should build a workflow that looks like:
 
 Add workflow graph
 
-#### Input data
+####  3.2.2. <a name='Inputdata'></a>Input data
 
 It consists of: 
 
@@ -50,7 +78,7 @@ It consists of:
 - The reference genome to map the reads against (https://www.ncbi.nlm.nih.gov/nuccore/MN908947). Which can be download here:
   - [reference]()
 
-#### Detailed steps
+####  3.2.3. <a name='Detailedsteps'></a>Detailed steps
 
 ##### 1. Mapping the reads on a reference genome
 
@@ -112,7 +140,7 @@ Bla bla diferrence between nexclade and Pangolin
     pangolin --usher 'sample_consensus.fa' -t 20 --outfile Pangolin_lineage_report.csv
     ```
 
-#### List of tools needed
+####  3.2.4. <a name='Listoftoolsneeded'></a>List of tools needed
 
 Here are the list of tools you will need in the workflow with a corresponding container to use them:
 
@@ -125,25 +153,25 @@ Here are the list of tools you will need in the workflow with a corresponding co
 | [bwa](https://github.com/lh3/bwa)   | `evolbioinfo/bwa:v0.7.17`  |
 
 
-#### Analysis Questions
+####  3.2.5. <a name='AnalysisQuestions'></a>Analysis Questions
 
 After running the workflow, we can analyse the resutls
 * Using the xx file and the xx website, determine what lineage/clade is the sample?
 * What year do you estimate the sequence samples were obtained (using the xx website)?
 * Why is it important to regurlay sequence a viruses genetique code (espicially from different areas and at different times)?
 
-#### Correction   
+####  3.2.6. <a name='Correction'></a>Correction   
 
 A correction workflow will be added to the repo at the end of the tutoriel       
 
 
 <!--TODO Fill this out-->
 
-### Reproducibility consensus
+###  3.3. <a name='Reproducibilityconsensus'></a>Reproducibility consensus
 
 Link to reproducibility consensus workflow can be found [here]()
 
-## Intended Audience, Format and Special Equipment Needs
+##  4. <a name='IntendedAudienceFormatandSpecialEquipmentNeeds'></a>Intended Audience, Format and Special Equipment Needs
 
 * Intended Audience: This introductory-level tutorial is targeted at scientists with an informatics background who analyse data in their projects. Participants should have an intermediate level of proficiency in Bash (navigate a terminal, install software, manage dependencies). No prior bioinformatics or biological knowledge is needed.
 * Format: The tutorial will follow a hybrid format, one instructor will be at the conference, while another will be connected remotely.
@@ -153,7 +181,7 @@ Link to reproducibility consensus workflow can be found [here]()
   * link
   * link
 
-## Authors 
+##  5. <a name='Authors'></a>Authors 
 
 <!--TODO add ORcid for authors-->
 
@@ -161,13 +189,13 @@ Link to reproducibility consensus workflow can be found [here]()
 * [Sarah Cohen-Boulakia](https://orcid.org/0000-0002-7439-1441)
 * [Frédéric Lemoine](https://orcid.org/0000-0001-9576-4449)
 
-## References 
+##  6. <a name='References'></a>References 
 
 <!--TODO fill this out-->
 __________________________________
 
 
-## TODO 
+##  7. <a name='TODO'></a>TODO 
 
 * Prepare readme for website
 * Prepare slides for tutoriel
