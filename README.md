@@ -57,9 +57,12 @@ To do so we will start from a sample that has been sequenced on an Illumina sequ
 3. Building consensus sequence
 4. Detect clade
 
-You should build a workflow that looks like:
+The resulting workflow should look like this:
 
-Add workflow graph
+![](img/wf.png)
+
+
+<img src="img/wf.png" alt="Workflow graph" width="200"/>
 
 ####  b. <a name='Inputdata'></a>Input data
 
