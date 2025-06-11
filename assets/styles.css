@@ -1,0 +1,30 @@
+body {
+    margin-top: 10px;
+    margin-left: 15%;
+    margin-right: 15%;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+img {
+    display: block;
+    margin: auto;
+}
+
+figcaption {
+    text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6 {font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif}
+
+h2{
+    color: rgb(56, 56, 117);
+}
+
+
+h3{
+    color: rgb(38, 78, 54);
+}
+
+h4{
+    color: rgb(127, 78, 0);
+}

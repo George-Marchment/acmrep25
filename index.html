@@ -1,263 +1,339 @@
-<h1 id="computational-reproducibility-with-scientific-workflows-analysing-viral-genomes-with-nextflow">Computational
-    Reproducibility With Scientific Workflows: Analysing viral genomes with Nextflow</h1>
-<p>An ACM Rep 2025 tutoriel</p>
-<ul>
-    <li>I. <a href="#Abstract">Abstract</a></li>
-    <li>II. <a href="#LearningObjectivesandoutline">Learning Objectives and outline</a></li>
-    <li>III. <a href="#TutorielMaterial">Tutoriel Material</a>
-        <ul>
-            <li>A. <a href="#Lecture">Lecture</a></li>
-            <li>B. <a href="#PraticalSession">Pratical Session</a>
-                <ul>
-                    <li>a. <a href="#Objectif">Objectif</a></li>
-                    <li>b. <a href="#Inputdata">Input data</a></li>
-                    <li>c. <a href="#Detailedsteps">Detailed steps</a></li>
-                    <li>d. <a href="#Listoftoolsneeded">List of tools needed</a></li>
-                    <li>e. <a href="#AnalysisQuestions">Analysis Questions</a></li>
-                    <li>f. <a href="#Correction">Correction</a></li>
-                </ul>
-            </li>
-            <li>C. <a href="#Reproducibilityconsensus">Reproducibility consensus</a></li>
-        </ul>
-    </li>
-    <li>IV. <a href="#IntendedAudienceFormatandSpecialEquipmentNeeds">Intended Audience, Format and Special Equipment
-            Needs</a></li>
-    <li>V. <a href="#Authors">Authors</a></li>
-    <li>VI. <a href="#References">References</a></li>
-    <li>VII. <a href="#TODO">TODO</a></li>
-</ul>
-<h2 id="i-a-name-abstract-a-abstract">I. <a name='Abstract'></a>Abstract</h2>
-<p>In an era of generation of large datasets and complex scientific analyses, ensuring the reproducibility of data
-    analyses has become paramount. Workflow management systems have emerged as a key solution to this challenge. By
-    managing the software environment, task scheduling, parallelisation and communication with the execution machines
-    (HPC, cloud, etc.), they significantly facilitate workflow development compared to historical practices (e.g.,
-    simple bash scripts), all while ensuring scalablility and a high level of reproducibility [2]. However, while they
-    are becoming more popular, workflow management systems have not yet gained wide adoption within the scientific
-    community, largely due to established practices and the perceived high learning curve associated with their use.
-</p>
-<p>This tutorial aims at demonstrating the critical role of workflow management systems in implementing reproducible
-    data analyses, with an emphasis on their capacity to encapsulate heterogeneous code, manage software environments,
-    scale with the data size, and leverage heterogeneous computational resources efficiently. To do so, we will use the
-    Nextflow [1] workflow system and a viral genome sequence reconstruction pipeline as a use case. This will
-    demonstrate the fundamentals of Nextflow and illustrate how it can be used to easily implement, execute, and share a
-    simple workflow. </p>
-<h2 id="ii-a-name-learningobjectivesandoutline-a-learning-objectives-and-outline">II. <a
-        name='LearningObjectivesandoutline'></a>Learning Objectives and outline</h2>
-<p>Key learning outcomes include (i) acquiring basic workflow concepts (ii) learning how to implement simple workflows
-    and (iii) understanding the capabilities of workflow management systems in encapsulating heterogeneous code,
-    scalability, software environment management, and computational resource management. The tutorial will be organized
-    in three phases.</p>
-<ol>
-    <li>We will start with a short lecture to present the main challenges in implementing reproducible data analyses,
-        specifically using a motivating example for illustration. We will then introduce how workflow management systems
-        are capable of solving these challenges. To achieve this, we will present the Nextflow framework and then
-        demonstrate how it can be used to solve the motivating example. Finally, we will introduce the analysis pipeline
-        to implement as a workflow. It consists of several viral genome sequencing datasets that need to go through
-        multiple analysis steps in order to reconstruct full viral genomes with their annotations.</li>
-    <li>The second part of the tutorial will consist of a practical session, during which the participants will
-        implement the analysis using the Nextflow management system. The session will be highly interactive, featuring
-        coding demonstrations and structured group discussions, which will allow participants to apply their knowledge,
-        with organizers providing support and answering questions. </li>
-    <li>The tutorial will conclude with a discussion and survey on the challenges encountered. We will then conduct a
-        reproducibility consensus by evaluating the results provided by the participants, where we as a group will
-        assess the level of reproducibility achieved, fostering a collaborative evaluation of the reproducibility
-        achieved. </li>
-</ol>
-<p>By the end of the tutorial, participants will have a solid foundation in workflow management systems and be capable
-    of designing and implementing reproducible data analysis workflows, aligning with the broader goals and themes of <a
-        href="">ACM REP 2025</a>.</p>
-<h2 id="iii-a-name-tutorielmaterial-a-tutoriel-material">III. <a name='TutorielMaterial'></a>Tutoriel Material</h2>
-<h3 id="a-a-name-lecture-a-lecture">A. <a name='Lecture'></a>Lecture</h3>
-<p>Link to the lecture slides can be found <a href="">here</a>.</p>
-<h3 id="b-a-name-praticalsession-a-pratical-session">B. <a name='PraticalSession'></a>Pratical Session</h3>
-<h4 id="a-a-name-objectif-a-objectif">a. <a name='Objectif'></a>Objectif</h4>
-<p>The goal is to analyse a SARS-CoV-2 sequencing dataset, in order to:</p>
-<ol>
-    <li>Infer the full sequence of the virus</li>
-    <li>Detect the <a href="https://clades.nextstrain.org/">clade</a> (alpha, beta, etc.). </li>
-</ol>
-<p>To do so we will start from a sample that has been sequenced on an Illumina sequencer, and we will run the following
-    steps:</p>
-<ol>
-    <li>Mapping the reads on a reference genome</li>
-    <li>SNP Calling</li>
-    <li>Building consensus sequence</li>
-    <li>Detect clade</li>
-</ol>
-<p>The resulting workflow should look like this:</p>
-<p><img src="img/wf.png" alt="Workflow graph" width="80%" class="center" /></p>
-<h4 id="b-a-name-inputdata-a-input-data">b. <a name='Inputdata'></a>Input data</h4>
-<p>It consists of: </p>
-<ul>
-    <li>Two compressed fastq files containing paired-end reads from Amplicon sequencing a SARS-CoV2 sample. Which can be
-        downloaded here:<ul>
-            <li>Reads 1: <a href="">here</a></li>
-            <li>Reads 2: <a href="https://dl.psteur.fr/fop/qfY4jEJ6/SRR13182925_2.fastq.gz">here</a></li>
-        </ul>
-    </li>
-    <li>The reference genome to map the reads against (<a
-            href="https://www.ncbi.nlm.nih.gov/nuccore/MN908947">https://www.ncbi.nlm.nih.gov/nuccore/MN908947</a>).
-        Which can be download here:<ul>
-            <li><a href="">reference</a></li>
-        </ul>
-    </li>
-</ul>
-<h4 id="c-a-name-detailedsteps-a-detailed-steps">c. <a name='Detailedsteps'></a>Detailed steps</h4>
-<h5 id="1-mapping-the-reads-on-a-reference-genome">1. Mapping the reads on a reference genome</h5>
-<ul>
-    <li>Read mapping will be performed using <a href="https://github.com/lh3/bwa">bwa mem</a> .</li>
-    <li>
-        <p>Command lines:</p>
-        <ul>
-            <li>
-                <p>Indexing the reference genome:</p>
-                <pre><code>bwa <span class="hljs-keyword">index</span> <span class="hljs-keyword">reference</span>.fa
-</code></pre>
-            </li>
-            <li>
-                <p>Mapping the reads:</p>
-                <pre><code>bwa mem -t <span class="hljs-number">1</span> reference<span class="hljs-selector-class">.fa</span> reads1<span class="hljs-selector-class">.fq</span> reads2<span class="hljs-selector-class">.fq</span> &gt; tmp.sam
-</code></pre>
-            </li>
-            <li>
-                <p>Converting sam file to bam file:</p>
-                <pre><code>samtools sort -o sample<span class="hljs-selector-class">.bam</span> tmp<span class="hljs-selector-class">.sam</span>
-samtools index sample.bam
-</code></pre>
-            </li>
-        </ul>
-    </li>
-</ul>
-<h5 id="2-snp-calling">2. SNP Calling</h5>
-<ul>
-    <li>SNP Calling will be performed with <a href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a>.
-    </li>
-    <li>Command lines:
-        <pre><code>samtools mpileup -A -d <span class="hljs-number">600000</span> --reference reference.fasta -B -Q <span class="hljs-number">0</span> sample.bam | ivar variants -r reference.fa -p sample.variants -q <span class="hljs-number">0</span> -t <span class="hljs-number">0.02</span>
-</code></pre>
-    </li>
-</ul>
-<h5 id="3-building-consensus-sequence">3. Building consensus sequence</h5>
-<ul>
-    <li>Consensus sequence will be inferred also using <a
-            href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a> </li>
-    <li>Command lines:
-        <pre><code>samtools mpileup -d <span class="hljs-number">600000</span> -A -Q <span class="hljs-number">0</span> -F <span class="hljs-number">0</span> sample.bam | ivar consensus -q <span class="hljs-number">20</span> -t <span class="hljs-number">0</span> -m <span class="hljs-number">5</span> -n N -p sample_consensus
-</code></pre>
-    </li>
-</ul>
-<h5 id="4-detecting-clade">4. Detecting clade</h5>
-<p>Bla bla diferrence between nexclade and Pangolin</p>
-<ul>
-    <li>
-        <p>Detecting clade (<a href="https://clades.nextstrain.org/">NextClade</a>)</p>
-        <ul>
-            <li>Clade detection is performed by Nextclade.</li>
-            <li>You will first need to download the sars-cov-2 reference files:
-                <pre><code><span class="hljs-string">nextclade </span><span class="hljs-string">dataset </span><span class="hljs-string">get </span><span class="hljs-built_in">--name</span> <span class="hljs-string">'sars-cov-2'</span> <span class="hljs-built_in">--output-dir</span> <span class="hljs-string">'ncref'</span>
-</code></pre>
-            </li>
-            <li>Then, use these reference files along the fasta file to annotate the sample consensus:
-                ```
-                nextclade run --in-order --input-dataset ${ncref} --output-tsv &#39;annotations.tsv&#39; ${seq}
-                sed -i &#39;s/\x0D\$//&#39; annotations.tsv</li>
-        </ul>
-    </li>
-    <li>
-        <p>Detecting clade (<a href="https://cov-lineages.org/">Pangolin</a>)</p>
-        <ul>
-            <li>Clade detection is performed by Pangolin.</li>
-            <li>Command lines:
-                <pre><code>PATH=<span class="hljs-regexp">/opt/</span>conda<span class="hljs-regexp">/envs/</span>pangolin<span class="hljs-regexp">/bin/</span>:\<span class="hljs-variable">$PATH</span>
-pangolin --usher <span class="hljs-string">'sample_consensus.fa'</span> -t <span class="hljs-number">20</span> --outfile Pangolin_lineage_report.csv
-</code></pre>
-            </li>
-        </ul>
-    </li>
-</ul>
-<h4 id="d-a-name-listoftoolsneeded-a-list-of-tools-needed">d. <a name='Listoftoolsneeded'></a>List of tools needed</h4>
-<p>Here are the list of tools you will need in the workflow with a corresponding container to use them:</p>
-<table>
-    <thead>
-        <tr>
-            <th>Tool</th>
-            <th>Container</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><a href="https://github.com/samtools/samtools">samtools</a></td>
-            <td><code>evolbioinfo/samtools:v1.11</code></td>
-        </tr>
-        <tr>
-            <td><a href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a></td>
-            <td><code>evolbioinfo/ivar:v1.3.1</code></td>
-        </tr>
-        <tr>
-            <td><a href="https://clades.nextstrain.org/">Nextclade</a></td>
-            <td><code>nextstrain/nextclade:3.13.3</code></td>
-        </tr>
-        <tr>
-            <td><a href="https://cov-lineages.org/">Pangolin</a></td>
-            <td><code>evolbioinfo/pangolin:v4.3.1-v1.33-v0.3.19-v0.1.12</code></td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/lh3/bwa">bwa</a></td>
-            <td><code>evolbioinfo/bwa:v0.7.17</code></td>
-        </tr>
-    </tbody>
-</table>
-<h4 id="e-a-name-analysisquestions-a-analysis-questions">e. <a name='AnalysisQuestions'></a>Analysis Questions</h4>
-<p>After running the workflow, we can analyse the resutls</p>
-<ul>
-    <li>Using the xx file and the xx website, determine what lineage/clade is the sample?</li>
-    <li>What year do you estimate the sequence samples were obtained (using the xx website)?</li>
-    <li>Why is it important to regurlay sequence a viruses genetique code (espicially from different areas and at
-        different times)?</li>
-</ul>
-<h4 id="f-a-name-correction-a-correction">f. <a name='Correction'></a>Correction</h4>
-<p>A correction workflow will be added to the repo at the end of the tutoriel </p>
-<!--TODO Fill this out-->
-<h3 id="c-a-name-reproducibilityconsensus-a-reproducibility-consensus">C. <a
-        name='Reproducibilityconsensus'></a>Reproducibility consensus</h3>
-<p>Link to reproducibility consensus workflow can be found <a href="">here</a></p>
-<h2
-    id="iv-a-name-intendedaudienceformatandspecialequipmentneeds-a-intended-audience-format-and-special-equipment-needs">
-    IV. <a name='IntendedAudienceFormatandSpecialEquipmentNeeds'></a>Intended Audience, Format and Special Equipment
-    Needs</h2>
-<ul>
-    <li>Intended Audience: This introductory-level tutorial is targeted at scientists with an informatics background who
-        analyse data in their projects. Participants should have an intermediate level of proficiency in Bash (navigate
-        a terminal, install software, manage dependencies). No prior bioinformatics or biological knowledge is needed.
-    </li>
-    <li>Format: The tutorial will follow a hybrid format, one instructor will be at the conference, while another will
-        be connected remotely.</li>
-    <li>Length: The tutorial will last half a day (3 hours).</li>
-    <li>Special Equipment Needs: Participants will need access to a terminal (Linux or Mac) and should have
-        Apptainer/Docker and Nextflow installed prior to the tutorial, for infromation to install the different
-        software, see here<ul>
-            <li>link</li>
-            <li>link</li>
-            <li>link</li>
-        </ul>
-    </li>
-</ul>
-<h2 id="v-a-name-authors-a-authors">V. <a name='Authors'></a>Authors</h2>
-<!--TODO add ORcid for authors-->
-<ul>
-    <li><a href="https://orcid.org/0000-0002-4565-3940">George Marchment</a></li>
-    <li><a href="https://orcid.org/0000-0002-7439-1441">Sarah Cohen-Boulakia</a></li>
-    <li><a href="https://orcid.org/0000-0001-9576-4449">Frédéric Lemoine</a></li>
-</ul>
-<h2 id="vi-a-name-references-a-references">VI. <a name='References'></a>References</h2>
-<!--TODO fill this out-->
-<hr>
-<h2 id="vii-a-name-todo-a-todo">VII. <a name='TODO'></a>TODO</h2>
-<ul>
-    <li>Prepare readme for website</li>
-    <li>Prepare slides for tutoriel</li>
-    <li>Prepare correction of workflow </li>
-    <li>prepare scipt which automatically verifies the validty of result (possibly have different levels of
-        reproducibility)</li>
-    <li></li>
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>ACM Tutoriel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body>
+    <h1 id="computational-reproducibility-with-scientific-workflows-analysing-viral-genomes-with-nextflow">Computational
+        Reproducibility With Scientific Workflows: Analysing viral genomes with Nextflow</h1>
+    <p>An ACM Rep 2025 tutoriel</p>
+    <h2>Table of content</h2>
+    <ul>
+        <li>I. <a href="#Abstract">Abstract</a></li>
+        <li>II. <a href="#LearningObjectivesandoutline">Learning Objectives and outline</a></li>
+        <li>III. <a href="#TutorielMaterial">Tutoriel Material</a>
+            <ul>
+                <li>A. <a href="#Lecture">Lecture</a></li>
+                <li>B. <a href="#PraticalSession">Pratical Session</a>
+                    <ul>
+                        <li>a. <a href="#Objectif">Objectif</a></li>
+                        <li>b. <a href="#Inputdata">Input data</a></li>
+                        <li>c. <a href="#Detailedsteps">Detailed steps</a></li>
+                        <li>d. <a href="#Listoftoolsneeded">List of tools needed</a></li>
+                        <li>e. <a href="#AnalysisQuestions">Analysis Questions</a></li>
+                        <li>f. <a href="#Correction">Correction</a></li>
+                    </ul>
+                </li>
+                <li>C. <a href="#Reproducibilityconsensus">Reproducibility consensus</a></li>
+            </ul>
+        </li>
+        <li>IV. <a href="#IntendedAudienceFormatandSpecialEquipmentNeeds">Intended Audience, Format and Special
+                Equipment
+                Needs</a></li>
+        <li>V. <a href="#Authors">Authors</a></li>
+        <li>VI. <a href="#References">References</a></li>
+        <li>VII. <a href="#TODO">TODO</a></li>
+    </ul>
+
+
+    <!--ABSTRACT-->
+    <h2 id="i-a-name-abstract-a-abstract">I. <a name='Abstract'></a>Abstract</h2>
+    <p>In an era of generation of large datasets and complex scientific analyses, ensuring the reproducibility of data
+        analyses has become paramount. Workflow management systems have emerged as a key solution to this challenge. By
+        managing the software environment, task scheduling, parallelisation and communication with the execution
+        machines
+        (HPC, cloud, etc.), they significantly facilitate workflow development compared to historical practices (e.g.,
+        simple bash scripts), all while ensuring scalablility and a high level of reproducibility [2]. However, while
+        they
+        are becoming more popular, workflow management systems have not yet gained wide adoption within the scientific
+        community, largely due to established practices and the perceived high learning curve associated with their use.
+    </p>
+    <p>This tutorial aims at demonstrating the critical role of workflow management systems in implementing reproducible
+        data analyses, with an emphasis on their capacity to encapsulate heterogeneous code, manage software
+        environments,
+        scale with the data size, and leverage heterogeneous computational resources efficiently. To do so, we will use
+        the
+        Nextflow [1] workflow system and a viral genome sequence reconstruction pipeline as a use case. This will
+        demonstrate the fundamentals of Nextflow and illustrate how it can be used to easily implement, execute, and
+        share a
+        simple workflow. </p>
+
+    <p><img src="img/intro.png" alt="intro" width="70%" /></p>
+
+
+
+    <!--Learning Objectives and outline-->
+    <h2 id="ii-a-name-learningobjectivesandoutline-a-learning-objectives-and-outline">II. <a
+            name='LearningObjectivesandoutline'></a>Learning Objectives and outline</h2>
+    <p>Key learning outcomes include (i) acquiring basic workflow concepts (ii) learning how to implement simple
+        workflows
+        and (iii) understanding the capabilities of workflow management systems in encapsulating heterogeneous code,
+        scalability, software environment management, and computational resource management. The tutorial will be
+        organized
+        in three phases.</p>
+    <ol>
+        <li>We will start with a short lecture to present the main challenges in implementing reproducible data
+            analyses,
+            specifically using a motivating example for illustration. We will then introduce how workflow management
+            systems
+            are capable of solving these challenges. To achieve this, we will present the Nextflow framework and then
+            demonstrate how it can be used to solve the motivating example. Finally, we will introduce the analysis
+            pipeline
+            to implement as a workflow. It consists of several viral genome sequencing datasets that need to go through
+            multiple analysis steps in order to reconstruct full viral genomes with their annotations.</li>
+        <li>The second part of the tutorial will consist of a practical session, during which the participants will
+            implement the analysis using the Nextflow management system. The session will be highly interactive,
+            featuring
+            coding demonstrations and structured group discussions, which will allow participants to apply their
+            knowledge,
+            with organizers providing support and answering questions. </li>
+        <li>The tutorial will conclude with a discussion and survey on the challenges encountered. We will then conduct
+            a
+            reproducibility consensus by evaluating the results provided by the participants, where we as a group will
+            assess the level of reproducibility achieved, fostering a collaborative evaluation of the reproducibility
+            achieved. </li>
+    </ol>
+    <p>By the end of the tutorial, participants will have a solid foundation in workflow management systems and be
+        capable
+        of designing and implementing reproducible data analysis workflows, aligning with the broader goals and themes
+        of <a href="https://acm-rep.github.io/2025/">ACM REP 2025</a>.</p>
+
+
+
+
+    <!--Tutoriel Material-->
+    <h2 id="iii-a-name-tutorielmaterial-a-tutoriel-material">III. <a name='TutorielMaterial'></a>Tutoriel Material</h2>
+    <h3 id="a-a-name-lecture-a-lecture">A. <a name='Lecture'></a>Lecture</h3>
+    <p>Link to the lecture slides can be found <a href="">here</a>.</p>
+    <h3 id="b-a-name-praticalsession-a-pratical-session">B. <a name='PraticalSession'></a>Pratical Session</h3>
+    <h4 id="a-a-name-objectif-a-objectif">a. <a name='Objectif'></a>Objectif</h4>
+
+
+    <p>
+        The aim of this practical session is to create a Nextflow workflow to analyse a SARS-CoV-2 sequencing dataset.
+        The
+        objectives are:
+    <ol>
+        <li>Infer the full sequence of the virus</li>
+        <li>Detect the <a href="https://clades.nextstrain.org/">clade</a> (alpha, beta, etc.). </li>
+    </ol>
+
+
+    To do so we will start from a sample that has been sequenced on an Illumina sequencer, and we will run the following
+    steps:
+    <ol>
+        <li>Map the reads onto a reference genome.</li>
+        <li>Build the consensus sequence from the mapped reads.</li>
+        <li>Identify the clade of the virus based on the consensus sequence.</li>
+    </ol>
+
+    Performing these types of analysis, understanding the genetic sequence and clade of a virus is crucial for multiple
+    reasons.
+    <ul>
+        <li> Firstly, they help in the tracking of the evolution and spread of the virus, providing insights into how it
+            mutates over time.
+            This information is vital for public health officials to make informed decisions and implement effective
+            control measures.
+        <li> Secondly, identifying specific clades can help in understanding the virulence and transmissibility of
+            different variants, which is essential for developing targeted treatments and vaccines.
+            Additionally, this analysis supports epidemiological studies by enabling the identification of outbreak
+            sources and transmission patterns.
+    </ul> Overall, the detailed genetic analysis of viruses enhances the ability to respond to outbreaks.
+    </p>
+
+    <p>
+    <figure>
+        <img src="img/phylo.png" alt="coronavirus" width="70%" />
+        <figcaption>SARS-CoV-2 phylogeny from <a href="https://nextstrain.org">nextstrain.org</a>. Data updated
+            2025-06-09</figcaption>
+    </figure>
+
+    </p>
+
+    <h4 id="b-a-name-inputdata-a-input-data">b. <a name='Inputdata'></a>Input data</h4>
+    <p>It consists of: </p>
+    <ul>
+        <li>Two compressed fastq files containing paired-end reads from Amplicon sequencing a SARS-CoV2 sample. Which
+            can be
+            downloaded here:<ul>
+                <li>Reads 1: <a href="">here</a></li>
+                <li>Reads 2: <a href="https://dl.psteur.fr/fop/qfY4jEJ6/SRR13182925_2.fastq.gz">here</a></li>
+            </ul>
+        </li>
+        <li>The reference genome to map the reads against (<a
+                href="https://www.ncbi.nlm.nih.gov/nuccore/MN908947">https://www.ncbi.nlm.nih.gov/nuccore/MN908947</a>).
+            Which can be download here:<ul>
+                <li><a href="">reference</a></li>
+            </ul>
+        </li>
+    </ul>
+
+
+
+    <h4 id="c-a-name-detailedsteps-a-detailed-steps">c. <a name='Detailedsteps'></a>Detailed steps</h4>
+
+    <p>The resulting workflow should look like this:</p>
+    <p><img src="img/wf.png" alt="Workflow graph" width="70%" /></p>
+
+    <h5 id="1-mapping-the-reads-on-a-reference-genome">1. Mapping the reads on a reference genome</h5>
+    <ul>
+        <li>Read mapping will be performed using <a href="https://github.com/lh3/bwa">bwa mem</a>.</li>
+        <li>
+            <p>Command lines:</p>
+            <ul>
+                <li>
+                    Indexing the reference genome:</p>
+                    <pre><kbd>bwa index reference.fa</kbd></pre>
+                </li>
+                <li>
+                    <p>Mapping the reads:</p>
+                    <pre><kbd>bwa mem -t 1 reference.fa reads1.fq reads2.fq > tmp.sam</kbd></pre>
+                </li>
+                <li>
+                    <p>Converting sam file to bam file:</p>
+                    <pre><kbd>samtools sort -o sample.bam tmp.sam</kbd>
+<kbd>samtools index sample.bam</kbd></pre>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <h5 id="2-building-consensus-sequence">2. Building consensus sequence</h5>
+    <ul>
+        <li>Consensus sequence will be inferred also using <a
+                href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a> </li>
+        <li>
+            <p>Command lines:</p>
+            <pre><kbd>samtools mpileup -d 600000 -A -Q 0 -F 0 ${bam} | ivar consensus -q 20 -t 0 -m 5 -n N -p ${name}</kbd></pre>
+        </li>
+    </ul>
+    <h5 id="3-detecting-clade">3. Detecting clade</h5>
+    <p>Bla bla diferrence between nexclade and Pangolin</p>
+    <ul>
+        <li>
+            <p>Detecting clade (<a href="https://clades.nextstrain.org/">NextClade</a>)</p>
+            <ul>
+                <li>Clade detection is performed by Nextclade.</li>
+                <li>
+                    <p>You will first need to download the sars-cov-2 reference files:</p>
+                    <pre><kbd>nextclade dataset get --name 'sars-cov-2' --output-dir 'ncref'</kbd></pre>
+                </li>
+                <li>
+                    <p>Then, use these reference files along the fasta file to annotate the sample consensus:</p>
+                    <pre><kbd>nextclade run --in-order --input-dataset ${ncref} --output-tsv &#39;annotations.tsv&#39; ${seq}</kbd>
+<kbd>sed -i &#39;s/\x0D\$//&#39; annotations.tsv</kbd></pre>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <p>Detecting clade (<a href="https://cov-lineages.org/">Pangolin</a>)</p>
+            <ul>
+                <li>Clade detection is performed by Pangolin.</li>
+                <li>
+                    <p>Command lines:</p>
+                    <pre><kbd>PATH=/opt/conda/envs/pangolin/bin/:\$PATH</kbd>
+<kbd>pangolin --usher 'sample_consensus.fa' -t 20 --outfile Pangolin_lineage_report.csv</kbd></pre>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <h4 id="d-a-name-listoftoolsneeded-a-list-of-tools-needed">d. <a name='Listoftoolsneeded'></a>List of tools needed
+    </h4>
+    <p>Here are the list of tools you will need in the workflow with a corresponding container to use them:</p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Tool</th>
+                <th>Container</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="https://github.com/samtools/samtools">samtools</a></td>
+                <td><code>evolbioinfo/samtools:v1.11</code></td>
+            </tr>
+            <tr>
+                <td><a href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a></td>
+                <td><code>evolbioinfo/ivar:v1.3.1</code></td>
+            </tr>
+            <tr>
+                <td><a href="https://clades.nextstrain.org/">Nextclade</a></td>
+                <td><code>nextstrain/nextclade:3.13.3</code></td>
+            </tr>
+            <tr>
+                <td><a href="https://cov-lineages.org/">Pangolin</a></td>
+                <td><code>evolbioinfo/pangolin:v4.3.1-v1.33-v0.3.19-v0.1.12</code></td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/lh3/bwa">bwa</a></td>
+                <td><code>evolbioinfo/bwa:v0.7.17</code></td>
+            </tr>
+        </tbody>
+    </table>
+    <h4 id="e-a-name-analysisquestions-a-analysis-questions">e. <a name='AnalysisQuestions'></a>Analysis Questions</h4>
+    <p>After running the workflow, we can analyse the resutls</p>
+    <ul>
+        <li>Using the xx file and the xx website, determine what lineage/clade is the sample?</li>
+        <li>What year do you estimate the sequence samples were obtained (using the xx website)?</li>
+        <li>Why is it important to regurlay sequence a viruses genetique code (espicially from different areas and at
+            different times)?</li>
+    </ul>
+    <h4 id="f-a-name-correction-a-correction">f. <a name='Correction'></a>Correction</h4>
+    <p>A correction workflow will be added to the repo at the end of the tutoriel </p>
+    <!--TODO Fill this out-->
+    <h3 id="c-a-name-reproducibilityconsensus-a-reproducibility-consensus">C. <a
+            name='Reproducibilityconsensus'></a>Reproducibility consensus</h3>
+    <p>Link to reproducibility consensus workflow can be found <a href="">here</a></p>
+    <h2
+        id="iv-a-name-intendedaudienceformatandspecialequipmentneeds-a-intended-audience-format-and-special-equipment-needs">
+        IV. <a name='IntendedAudienceFormatandSpecialEquipmentNeeds'></a>Intended Audience, Format and Special Equipment
+        Needs</h2>
+    <ul>
+        <li>Intended Audience: This introductory-level tutorial is targeted at scientists with an informatics background
+            who
+            analyse data in their projects. Participants should have an intermediate level of proficiency in Bash
+            (navigate
+            a terminal, install software, manage dependencies). No prior bioinformatics or biological knowledge is
+            needed.
+        </li>
+        <li>Format: The tutorial will follow a hybrid format, one instructor will be at the conference, while another
+            will
+            be connected remotely.</li>
+        <li>Length: The tutorial will last half a day (3 hours).</li>
+        <li>Special Equipment Needs: Participants will need access to a terminal (Linux or Mac) and should have
+            Apptainer/Docker and Nextflow installed prior to the tutorial, for infromation to install the different
+            software, see here<ul>
+                <li>link</li>
+                <li>link</li>
+                <li>link</li>
+            </ul>
+        </li>
+    </ul>
+    <h2 id="v-a-name-authors-a-authors">V. <a name='Authors'></a>Authors</h2>
+    <!--TODO add ORcid for authors-->
+    <ul>
+        <li><a href="https://orcid.org/0000-0002-4565-3940">George Marchment</a></li>
+        <li><a href="https://orcid.org/0000-0002-7439-1441">Sarah Cohen-Boulakia</a></li>
+        <li><a href="https://orcid.org/0000-0001-9576-4449">Frédéric Lemoine</a></li>
+    </ul>
+    <h2 id="vi-a-name-references-a-references">VI. <a name='References'></a>References</h2>
+    <!--TODO fill this out-->
+    <hr>
+    <h2 id="vii-a-name-todo-a-todo">VII. <a name='TODO'></a>TODO</h2>
+    <ul>
+        <li>Prepare readme for website</li>
+        <li>Prepare slides for tutoriel</li>
+        <li>Prepare correction of workflow </li>
+        <li>prepare scipt which automatically verifies the validty of result (possibly have different levels of
+            reproducibility)</li>
+        <li></li>
+    </ul>
+
+</body>
+
+</html>
