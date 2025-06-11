@@ -60,10 +60,10 @@ To do so we will start from a sample that has been sequenced on an Illumina sequ
 
 The resulting workflow should look like this:
 
-![](img/wf.png)
 
 
-<img src="img/wf.png" alt="Workflow graph" width="200"/>
+
+<img src="img/wf.png" alt="Workflow graph" width="80%" class="center"/>
 
 ####  b. <a name='Inputdata'></a>Input data
 
