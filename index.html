@@ -79,13 +79,14 @@
     <!--Learning Objectives and outline-->
     <h2 id="ii-a-name-learningobjectivesandoutline-a-learning-objectives-and-outline">II. <a
             name='LearningObjectivesandoutline'></a>Learning Objectives and outline</h2>
-    <p>Key learning outcomes include 
-        <ul>
-            <li> acquiring basic workflow concepts,
-            <li> learning how to implement simple workflows and 
-            <li> understanding the capabilities of workflow management systems in encapsulating heterogeneous code, scalability, software environment management, and computational resource management.
-        </ul>
-        The tutorial will be organized in three phases.</p>
+    <p>Key learning outcomes include
+    <ul>
+        <li> acquiring basic workflow concepts,
+        <li> learning how to implement simple workflows and
+        <li> understanding the capabilities of workflow management systems in encapsulating heterogeneous code,
+            scalability, software environment management, and computational resource management.
+    </ul>
+    The tutorial will be organized in three phases.</p>
     <ol>
         <li>We will start with a short lecture to present the main challenges in implementing reproducible data
             analyses,
@@ -119,7 +120,8 @@
     <!--Tutoriel Material-->
     <h2 id="iii-a-name-tutorielmaterial-a-tutoriel-material">III. <a name='TutorielMaterial'></a>Tutoriel Material</h2>
     <h3 id="a-a-name-lecture-a-lecture">A. <a name='Lecture'></a>Lecture</h3>
-    <p>Link to the lecture slides can be found <a href="">here</a>.</p>
+    <p>Link to the lecture slides can be found <a
+            href="https://github.com/George-Marchment/acmrep25/blob/main/tutoriel_material/slides.pdf">here</a>.</p>
     <h3 id="b-a-name-praticalsession-a-pratical-session">B. <a name='PraticalSession'></a>Pratical Session</h3>
     <h4 id="a-a-name-objectif-a-objectif">a. <a name='Objectif'></a>Objectif</h4>
 
@@ -171,14 +173,20 @@
         <li>Two compressed fastq files containing paired-end reads from Amplicon sequencing a SARS-CoV2 sample. Which
             can be
             downloaded here:<ul>
-                <li>Reads 1: <a href="">here</a></li>
-                <li>Reads 2: <a href="https://dl.psteur.fr/fop/qfY4jEJ6/SRR13182925_2.fastq.gz">here</a></li>
+                <li>Reads 1: <a
+                        href="https://github.com/George-Marchment/acmrep25/blob/main/data/reads/SRR13182925_1.fastq.gz">here</a>
+                </li>
+                <li>Reads 2: <a
+                        href="https://github.com/George-Marchment/acmrep25/blob/main/data/reads/SRR13182925_2.fastq.gz">here</a>
+                </li>
             </ul>
         </li>
         <li>The reference genome to map the reads against (<a
                 href="https://www.ncbi.nlm.nih.gov/nuccore/MN908947">https://www.ncbi.nlm.nih.gov/nuccore/MN908947</a>).
             Which can be download here:<ul>
-                <li><a href="">reference</a></li>
+                <li><a
+                        href="https://github.com/George-Marchment/acmrep25/blob/main/data/genome/reference.fa">reference</a>
+                </li>
             </ul>
         </li>
     </ul>
@@ -192,34 +200,71 @@
 
     <h5 id="1-mapping-the-reads-on-a-reference-genome">1. Mapping the reads on a reference genome</h5>
     <ul>
-        <li>Read mapping will be performed using <a href="https://github.com/lh3/bwa">bwa mem</a>.</li>
         <li>
-            <p>Command lines:</p>
-            <ul>
-                <li>
-                    Indexing the reference genome:</p>
-                    <pre><kbd>bwa index reference.fa</kbd></pre>
-                </li>
-                <li>
-                    <p>Mapping the reads:</p>
-                    <pre><kbd>bwa mem -t 1 reference.fa reads1.fq reads2.fq > tmp.sam</kbd></pre>
-                </li>
-                <li>
-                    <p>Converting sam file to bam file:</p>
-                    <pre><kbd>samtools sort -o sample.bam tmp.sam</kbd>
-<kbd>samtools index sample.bam</kbd></pre>
-                </li>
-            </ul>
+            <p>First the reference genome needs to be indexed, this steps is important since it allows to accelerate the
+                mapping process. For more information regarding genome indexing see <a
+                    href="https://pmbio.org/module-02-inputs/0002/04/01/Indexing/">here</a>.</p>
         </li>
+        <ul>
+            <li>
+                Input of step</p>
+                <pre><kbd>file ref</kbd></pre>
+            </li>
+            <li>
+                Output of step</p>
+                <pre><kbd>tuple val(ref.name), file("${ref.baseName}.*")</kbd></pre>
+            </li>
+            <li>
+                Command lines</p>
+                <pre><kbd>bwa index ${ref}</kbd></pre>
+            </li>
+        </ul>
+
+        <li>
+            <p>The next step is the mapping of the reads to reference genome... (develop this). Read mapping will be
+                performed using <a href="https://github.com/lh3/bwa">bwa mem</a>.</p>
+        </li>
+        <ul>
+            <li>
+                Inputs of step</p>
+                <pre><kbd>tuple val(name), file(f1), file(f2)</kbd>
+<kbd>tuple val(refName), file(ref)</kbd></pre>
+            </li>
+            <li>
+                Output of step</p>
+                <pre><kbd>tuple val(name), file("*.bam"), file("*.bai")</kbd></pre>
+            </li>
+            <li>
+                Command lines</p>
+                <pre><kbd>bwa mem -t 1 reference.fa reads1.fq reads2.fq > tmp.sam</kbd>
+<kbd>samtools sort -o sample.bam tmp.sam</kbd>
+<kbd>samtools index sample.bam</kbd></pre>
+            </li>
+        </ul>
+
+
     </ul>
     <h5 id="2-building-consensus-sequence">2. Building consensus sequence</h5>
     <ul>
-        <li>Consensus sequence will be inferred also using <a
-                href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a> </li>
-        <li>
-            <p>Command lines:</p>
-            <pre><kbd>samtools mpileup -d 600000 -A -Q 0 -F 0 ${bam} | ivar consensus -q 20 -t 0 -m 5 -n N -p ${name}</kbd></pre>
+        <li><p>Consensus sequence will be inferred also using <a
+                href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a>.
+            The consensus sequence allowq to ...</p>
         </li>
+        <ul>
+            <li>
+                Input of step</p>
+                <pre><kbd>tuple val(name), file(bam), file(bai)</kbd></pre>
+            </li>
+            <li>
+                Output of step</p>
+                <pre><kbd>file "${name}.fa"</kbd></pre>
+            </li>
+            <li>
+                Command lines</p>
+                <pre><kbd>samtools mpileup -d 600000 -A -Q 0 -F 0 ${bam} | ivar consensus -q 20 -t 0 -m 5 -n N -p ${name}</kbd></pre>
+            </li>
+        </ul>
+
     </ul>
     <h5 id="3-detecting-clade">3. Detecting clade</h5>
     <p>Bla bla diferrence between nexclade and Pangolin</p>
@@ -251,7 +296,8 @@
             </ul>
         </li>
     </ul>
-    <h4 id="d-a-name-listoftoolsneeded-a-list-of-tools-needed">d. <a name='Listoftoolsneeded'></a>List of tools needed
+    <h4 id="d-a-name-listoftoolsneeded-a-list-of-tools-needed">d. <a name='Listoftoolsneeded'></a>List of tools
+        needed
     </h4>
     <p>Here are the list of tools you will need in the workflow with a corresponding container to use them:</p>
     <table class="table table-striped">
@@ -284,12 +330,14 @@
             </tr>
         </tbody>
     </table>
-    <h4 id="e-a-name-analysisquestions-a-analysis-questions">e. <a name='AnalysisQuestions'></a>Analysis Questions</h4>
+    <h4 id="e-a-name-analysisquestions-a-analysis-questions">e. <a name='AnalysisQuestions'></a>Analysis Questions
+    </h4>
     <p>After running the workflow, we can analyse the resutls</p>
     <ul>
         <li>Using the xx file and the xx website, determine what lineage/clade is the sample?</li>
         <li>What year do you estimate the sequence samples were obtained (using the xx website)?</li>
-        <li>Why is it important to regurlay sequence a viruses genetique code (espicially from different areas and at
+        <li>Why is it important to regurlay sequence a viruses genetique code (espicially from different areas and
+            at
             different times)?</li>
     </ul>
     <h4 id="f-a-name-correction-a-correction">f. <a name='Correction'></a>Correction</h4>
@@ -300,17 +348,20 @@
     <p>Link to reproducibility consensus workflow can be found <a href="">here</a></p>
     <h2
         id="iv-a-name-intendedaudienceformatandspecialequipmentneeds-a-intended-audience-format-and-special-equipment-needs">
-        IV. <a name='IntendedAudienceFormatandSpecialEquipmentNeeds'></a>Intended Audience, Format and Special Equipment
+        IV. <a name='IntendedAudienceFormatandSpecialEquipmentNeeds'></a>Intended Audience, Format and Special
+        Equipment
         Needs</h2>
     <ul>
-        <li>Intended Audience: This introductory-level tutorial is targeted at scientists with an informatics background
+        <li>Intended Audience: This introductory-level tutorial is targeted at scientists with an informatics
+            background
             who
             analyse data in their projects. Participants should have an intermediate level of proficiency in Bash
             (navigate
             a terminal, install software, manage dependencies). No prior bioinformatics or biological knowledge is
             needed.
         </li>
-        <li>Format: The tutorial will follow a hybrid format, one instructor will be at the conference, while another
+        <li>Format: The tutorial will follow a hybrid format, one instructor will be at the conference, while
+            another
             will
             be connected remotely.</li>
         <li>Length: The tutorial will last half a day (3 hours).</li>
@@ -338,6 +389,7 @@
         <li>Prepare readme for website</li>
         <li>Prepare slides for tutoriel</li>
         <li>Prepare correction of workflow </li>
+        <li>Examples of workflows from different domaines (physics, ecological studies etc..) </li>
         <li>prepare scipt which automatically verifies the validty of result (possibly have different levels of
             reproducibility)</li>
         <li></li>
