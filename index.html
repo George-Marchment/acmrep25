@@ -13,6 +13,7 @@
     <h1 id="computational-reproducibility-with-scientific-workflows-analysing-viral-genomes-with-nextflow">Computational
         Reproducibility With Scientific Workflows: Analysing viral genomes with Nextflow</h1>
     <p>An ACM Rep 2025 tutoriel</p>
+    <p>TODO: Insert little comic here</p>
     <h2>Table of content</h2>
     <ul>
         <li>I. <a href="#Abstract">Abstract</a></li>
@@ -45,17 +46,27 @@
     <!--ABSTRACT-->
     <h2 id="i-a-name-abstract-a-abstract">I. <a name='Abstract'></a>Abstract</h2>
     <p>In an era of generation of large datasets and complex scientific analyses, ensuring the reproducibility of data
-        analyses has become paramount. Workflow management systems have emerged as a key solution to this challenge. By
-        managing the software environment, task scheduling, parallelisation and communication with the execution
-        machines
-        (HPC, cloud, etc.), they significantly facilitate workflow development compared to historical practices (e.g.,
-        simple bash scripts), all while ensuring scalablility and a high level of reproducibility [2]. However, while
-        they
-        are becoming more popular, workflow management systems have not yet gained wide adoption within the scientific
-        community, largely due to established practices and the perceived high learning curve associated with their use.
+        analyses has become paramount. <b>Workflow management systems have emerged as a key solution to this
+            challenge</b>. By
+        managing:
+    <ul>
+        <li> the software environment,
+        <li> task scheduling,
+        <li> parallelisation and
+        <li> communication with the execution machines (HPC, cloud, etc.).
+    </ul>
+    They significantly facilitate workflow development compared to historical practices (e.g.,
+    simple bash scripts), all while ensuring <b>scalablility</b> and a <b>high level of reproducibility</b> [2].
+    However, while
+    they
+    are becoming more popular, workflow management systems have not yet gained wide adoption within the scientific
+    community, largely due to established practices and the perceived high learning curve associated with their use.
     </p>
-    <p>This tutorial aims at demonstrating the critical role of workflow management systems in implementing reproducible
-        data analyses, with an emphasis on their capacity to encapsulate heterogeneous code, manage software
+
+    <p><img src="img/intro.png" alt="intro" width="70%" /></p>
+    <p><b>This tutorial aims at demonstrating the critical role of workflow management systems in implementing
+            reproducible
+            data analyses</b>, with an emphasis on their capacity to encapsulate heterogeneous code, manage software
         environments,
         scale with the data size, and leverage heterogeneous computational resources efficiently. To do so, we will use
         the
@@ -64,19 +75,17 @@
         share a
         simple workflow. </p>
 
-    <p><img src="img/intro.png" alt="intro" width="70%" /></p>
-
-
 
     <!--Learning Objectives and outline-->
     <h2 id="ii-a-name-learningobjectivesandoutline-a-learning-objectives-and-outline">II. <a
             name='LearningObjectivesandoutline'></a>Learning Objectives and outline</h2>
-    <p>Key learning outcomes include (i) acquiring basic workflow concepts (ii) learning how to implement simple
-        workflows
-        and (iii) understanding the capabilities of workflow management systems in encapsulating heterogeneous code,
-        scalability, software environment management, and computational resource management. The tutorial will be
-        organized
-        in three phases.</p>
+    <p>Key learning outcomes include 
+        <ul>
+            <li> acquiring basic workflow concepts,
+            <li> learning how to implement simple workflows and 
+            <li> understanding the capabilities of workflow management systems in encapsulating heterogeneous code, scalability, software environment management, and computational resource management.
+        </ul>
+        The tutorial will be organized in three phases.</p>
     <ol>
         <li>We will start with a short lecture to present the main challenges in implementing reproducible data
             analyses,
