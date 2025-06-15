@@ -244,11 +244,23 @@
 
 
     </ul>
+
+
     <h5 id="2-building-consensus-sequence">2. Building consensus sequence</h5>
     <ul>
-        <li><p>Consensus sequence will be inferred also using <a
-                href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a>.
-            The consensus sequence allowq to ...</p>
+        <li>
+            <p>Consensus sequence will be inferred also using <a
+                    href="https://andersen-lab.github.io/ivar/html/manualpage.html">iVAR</a>.
+                The consensus sequence is a theoretical representative of a nucleotide sequence in which each nucleotide
+                is the one which occurs most frequently at that site in the different sequences. The goal of using a
+                consensus
+                sequence is by using the most frequent nucleotide at each site, the conserved regions are preserved,
+                these being the most functionnaly important.
+                Additionaly, sequencing errors are also neglected (by averaging them out), creating
+                a sequence in which we have more confidence. For more information regarding the consensus sequence see
+                <a
+                    href="https://www.ncbi.nlm.nih.gov/mesh?Db=mesh&Cmd=DetailsSearch&Term=%22Consensus+Sequence%22%5BMeSH+Terms%5D">here</a>.
+            </p>
         </li>
         <ul>
             <li>
@@ -266,34 +278,88 @@
         </ul>
 
     </ul>
+
+
     <h5 id="3-detecting-clade">3. Detecting clade</h5>
-    <p>Bla bla diferrence between nexclade and Pangolin</p>
+    <p>
+        Viral diversity is often broken down into Clades or lineages which are defined by specific combinations of
+        signature mutations.
+        Clades are groups of related sequences that share a common ancestor.
+        To detect a sequences clade we use 2 different methods Pangolin and NextClade.
+        For more information see
+        <a
+            href="https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/04-clade-assignment.html">here</a>.
+    </p>
+
     <ul>
         <li>
             <p>Detecting clade (<a href="https://clades.nextstrain.org/">NextClade</a>)</p>
+        </li>
+        <p>Nextclade assigns sequences to clades by placing the sequences on a phylogenetic tree annotated with clade
+            definitions. More specifically, Nextclade assigns the clade of the nearest reference node found during the
+            Phylogenetic placement step.</p>
+        <ul>
+            <li>First, the nextclade sars-cov-2 reference files have to be downloaded.</li>
             <ul>
-                <li>Clade detection is performed by Nextclade.</li>
                 <li>
-                    <p>You will first need to download the sars-cov-2 reference files:</p>
-                    <pre><kbd>nextclade dataset get --name 'sars-cov-2' --output-dir 'ncref'</kbd></pre>
+                    Output of step</p>
+                    <pre><kbd>path "ncref"</kbd></pre>
                 </li>
                 <li>
-                    <p>Then, use these reference files along the fasta file to annotate the sample consensus:</p>
+                    Command lines</p>
+                    <pre><kbd>nextclade dataset get --name 'sars-cov-2' --output-dir 'ncref'</kbd></pre>
+                </li>
+            </ul>
+
+            <li>Then, use these reference files along the fasta file to annotate the sample consensus.</li>
+            <ul>
+                <li>
+                    Inputs of step</p>
+                    <pre><kbd>path ncref</kbd>
+<kbd>path seq</kbd></pre>
+                </li>
+                <li>
+                    Output of step</p>
+                    <pre><kbd>path "annotations.tsv"</kbd></pre>
+                </li>
+                <li>
+                    Command lines</p>
                     <pre><kbd>nextclade run --in-order --input-dataset ${ncref} --output-tsv &#39;annotations.tsv&#39; ${seq}</kbd>
 <kbd>sed -i &#39;s/\x0D\$//&#39; annotations.tsv</kbd></pre>
                 </li>
             </ul>
-        </li>
+
+        </ul>
+
+    </ul>
+
+
+
+    <ul>
         <li>
             <p>Detecting clade (<a href="https://cov-lineages.org/">Pangolin</a>)</p>
+            <p>
+                Pangolin will assign the most likely lineage out of all currently designated lineages.
+                For more information see <a
+                    href="https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/04-clade-assignment.html">here</a>.
+            </p>
             <ul>
-                <li>Clade detection is performed by Pangolin.</li>
                 <li>
-                    <p>Command lines:</p>
+                    Inputs of step</p>
+                    <pre><kbd>file fa</kbd>
+<kbd>path seq</kbd></pre>
+                </li>
+                <li>
+                    Output of step</p>
+                    <pre><kbd>file "*.csv"</kbd></pre>
+                </li>
+                <li>
+                    Command lines</p>
                     <pre><kbd>PATH=/opt/conda/envs/pangolin/bin/:\$PATH</kbd>
 <kbd>pangolin --usher 'sample_consensus.fa' -t 20 --outfile Pangolin_lineage_report.csv</kbd></pre>
                 </li>
             </ul>
+
         </li>
     </ul>
     <h4 id="d-a-name-listoftoolsneeded-a-list-of-tools-needed">d. <a name='Listoftoolsneeded'></a>List of tools
@@ -330,15 +396,17 @@
             </tr>
         </tbody>
     </table>
+    
+    
+    
     <h4 id="e-a-name-analysisquestions-a-analysis-questions">e. <a name='AnalysisQuestions'></a>Analysis Questions
     </h4>
-    <p>After running the workflow, we can analyse the resutls</p>
+    <p>After running the workflow, we can analyse some of its resutls</p>
     <ul>
-        <li>Using the xx file and the xx website, determine what lineage/clade is the sample?</li>
-        <li>What year do you estimate the sequence samples were obtained (using the xx website)?</li>
-        <li>Why is it important to regurlay sequence a viruses genetique code (espicially from different areas and
-            at
-            different times)?</li>
+        <li>Using the <code>annotations.tsv</code>, determine what clade has been predicted for the samples?</li>
+        <li>Using the <code>lineage_report.csv</code>, determine what lineage has been predicted for the samples?</li>
+        <li>What can you deduce?</li>
+        <li>What year do you estimate the sequence samples were obtained (using the clade and the <a href="https://clades.nextstrain.org/">Nextclade</a> website)?</li>
     </ul>
     <h4 id="f-a-name-correction-a-correction">f. <a name='Correction'></a>Correction</h4>
     <p>A correction workflow will be added to the repo at the end of the tutoriel </p>

@@ -18,11 +18,13 @@ h1, h2, h3, h4, h5, h6 {font-family:Cambria, Cochin, Georgia, Times, 'Times New 
 
 h2{
     color: rgb(56, 56, 117);
+    margin-top: 40px;
 }
 
 
 h3{
     color: rgb(38, 78, 54);
+    margin-top: 30px;
 }
 
 h4{
