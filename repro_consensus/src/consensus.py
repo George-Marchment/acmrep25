@@ -2,19 +2,22 @@
 import csv
 import glob
 import numpy as np
+import os
+import sys
 
 
+csv_file = glob.glob(f'{sys.argv[2]}/*/*.csv', recursive=False)
 
 #Reading the OG/gold standard results
-with open('./repro_consensus/results/lineage_report.csv', newline='') as csvfile:
+with open(f'{sys.argv[1]}/lineage_report.csv', newline='') as csvfile:
     true_lineage_report = next(csv.DictReader(csvfile))
 
-with open('./repro_consensus/results/annotations.tsv', newline='') as csvfile:
+with open(f'{sys.argv[1]}/annotations.tsv', newline='') as csvfile:
     true_annotations = next(csv.DictReader(csvfile, delimiter="\t"))
 
 
 #Reading the groups
-groups = glob.glob(f'./repro_consensus/results_participants/*', recursive=False)
+groups = glob.glob(f'{sys.argv[2]}/*', recursive=False)
 
 print(f"There are {len(groups)} groups who have sent their results to participate in the reproducibility consensus.\n")
 
@@ -70,7 +73,3 @@ print(f"There are {np.sum(indentical)} groups ({np.sum(indentical)/len(indentica
 print(f"There are {np.sum(indentical_lineage)} groups ({np.sum(indentical_lineage)/len(indentical)*100:.0f}%) which have exactly the same biological interpretation (lineage) to the gold standard")
 
 
-
-
-#print(true_lineage_report)
-#print(true_annotations)
