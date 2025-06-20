@@ -66,7 +66,7 @@ process show_clusters {
 
 workflow {
     filtered_data = filter_data(file("patients.csv"))
-    cleaned_data = preprocessing(Channel.fromPath('src/python2_script.py', followLinks: false), filtered_data)
-    points = analysis(Channel.fromPath('src/clustering.py', followLinks: false), cleaned_data)
-    show_clusters(Channel.fromPath('src/generate_cluster.R', followLinks: false), points)
+    cleaned_data = preprocessing(Channel.fromPath('src/python2_script.py'), filtered_data)
+    points = analysis(Channel.fromPath('src/clustering.py'), cleaned_data)
+    show_clusters(Channel.fromPath('src/generate_cluster.R'), points)
 }
