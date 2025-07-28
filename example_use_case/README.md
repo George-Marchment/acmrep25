@@ -1,12 +1,12 @@
 # Use-Case Workflow
 
-This Nextflow Workflow is an implementation of the use-case presented in the intro to the [lecture](https://github.com/George-Marchment/acmrep25/blob/main/tutoriel_material/slides.pdf) for ACM REP 2025 tutoriel "Computational Reproducibility With Scientific Workflows: Analysing viral genomes with Nextflow".
+This Nextflow Workflow is an implementation of the use-case presented in the intro to the [lecture](https://github.com/George-Marchment/acmrep25/blob/main/tutoriel_material/slides.pdf) for ACM REP 2025 tutorial "Computational Reproducibility With Scientific Workflows: Analysing viral genomes with Nextflow".
 
 This workflow is composed of 4 steps:
-1. A cleaning of data step
+1. A data cleaning step
 2. A preprocessing step
 3. The analysis step (clustering)
-4. The creation of the visual clusters
+4. The visualisation of the clusters
 
 <img align="center" src="../img/use-case-dag.png" width="60%">
 
